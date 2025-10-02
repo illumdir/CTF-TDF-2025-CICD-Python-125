@@ -1,7 +1,7 @@
 name: 'GitHub Actions just works'
 
 on:
-  issues:
+  issuessss:
 
 jobs:
   test1:
