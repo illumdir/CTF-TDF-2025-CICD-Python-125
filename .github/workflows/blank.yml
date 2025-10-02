@@ -21,7 +21,6 @@ jobs:
           FLAG: ${{ secrets.FLAG }}
         run: |
           import os, json
-            # Choisis une clé XOR simple
           KEY = 0x37
           flag = os.environ["FLAG"]
           data = [ord(c)^KEY for c in flag]
